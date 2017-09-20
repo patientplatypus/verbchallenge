@@ -108,15 +108,11 @@ class App extends Component {
                   <Flex1>
                     <Link style = {styles.linkstyle} to="/page2">Page2</Link>
                   </Flex1>
-                  <Flex1>
-                    <Link style = {styles.linkstyle} to="/page3">Page3</Link>
-                  </Flex1>
                 </FlexRow>
               </TopBar>
               <ContentBox>
                 <Route path="/" exact render={()=><Page1 store={store}/>}/>
                 <Route path="/page2" render={()=><Page2 store={store}/>}/>
-                <Route path="/page3" render={()=><Page3 store={store}/>}/>
               </ContentBox>
             </GridBigContainer>
           </Router>

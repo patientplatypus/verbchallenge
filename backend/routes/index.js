@@ -93,23 +93,35 @@ router.patch('/editpost/:id', function(req,res,next){
   })
 })
 
+router.delete('/deletepost/:id/:secret',function(req,res,next){
+  console.log("inside delete method");
+  console.log('value of req.body', req.params.secret);
+  Messages.findById(req.params.id, function(err, message){
+    console.log('value of message["secret"]', message['secret']);
+    console.log('value of req.body.secret', req.params.secret);
+    bcryptaspromised.compare(req.params.secret, message['secret'])
+      .then(function(result){
+        Messages.remove({
+                 _id: req.params.id
+             }, function(err, message) {
+                 if (err)
+                     res.send(err);
 
-// Delete example for good measure
+                 Messages.find({}, function(err, posts){
+                   posts.forEach((post)=>{
+                     post.secret='redacted'
+                   })
+                   console.log('new value of posts', posts);
+                   res.json({'status': 'messagedeleted', 'remainingposts': posts});
+                 })
+             });
+      })
+      .catch(bcryptaspromised.MISMATCH_ERROR, function(result){
+          res.send({'status':'passwordsdontmatch'});
+      });
+  });
+});
 
-// router.delete('/deleteItem/:delete_id',function(req,res,next){
-//   console.log("inside delete method");
-//
-//   Jobs.remove({
-//            _id: req.params.delete_id
-//        }, function(err, job) {
-//            if (err)
-//                res.send(err);
-//
-//            res.json({ message: 'Successfully deleted',
-//                       post: job});
-//        });
-//   });
-//
 
 
 

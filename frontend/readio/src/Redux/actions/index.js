@@ -49,16 +49,10 @@ export const messageCREATE = ({title, message, secret}) => {
   }
 }
 
-export const messageDELETE = messageID => {
-  return{
-    type: 'DELETE',
-    messageID: messageID
-  }
-}
 
 export const messageGET = () => {
   return (dispatch)=>{
-    console.log('inside GET');
+    console.log('inside GET ACTION');
     var getarray = [];
     axios.get('http://localhost:3000/allmessages')
     .then((response)=>{
@@ -111,6 +105,26 @@ export const messageUPDATE = (message, secret) => {
     })
     .catch((error)=>{
       console.log('error is: ', error);
+      dispatch(AXIOSERROR())
+    })
+  }
+}
+
+export const messageDELETE = (message, secret) => {
+  return (dispatch) => {
+    console.log('inside DELETE ACTION');
+    console.log('value of secret: ', secret);
+    var url = 'http://localhost:3000/deletepost/'+message._id+'/'+secret
+    axios.delete(url, {
+      message: message,
+      secret: secret
+    })
+    .then((response)=>{
+      console.log('response is ', response);
+      dispatch(AXIOSSUCCESS(response, 'DELETE'))
+    })
+    .catch((error)=>{
+      console.log('error is ', error);
       dispatch(AXIOSERROR())
     })
   }

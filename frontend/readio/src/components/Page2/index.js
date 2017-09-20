@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'react-redux'
-import { messageGET, messageUPDATE } from '../../Redux/actions'
+import { messageGET, messageUPDATE, messageDELETE } from '../../Redux/actions'
 
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -86,8 +86,6 @@ const SingleMessage = styled.div`
 `
 
 
-
-
 class Page2 extends Component {
   constructor(props) {
     super(props);
@@ -109,6 +107,8 @@ class Page2 extends Component {
       showeditbutton: false,
       showdeletebutton: false,
       singlemessage: [],
+      savedmessagetitle: [],
+      savedmessagemessage: [],
       editreturn: [],
     };
 
@@ -126,11 +126,17 @@ class Page2 extends Component {
         console.log('updated editreturn: ', this.state.editreturn);
         if(this.state.editreturn.data!=undefined){
           if(this.state.editreturn.data.status==='passwordsdontmatch'){
+            var localmessage = this.state.singlemessage
+            localmessage['title'] = this.state.savedmessagetitle;
+            localmessage['message'] = this.state.savedmessagemessage;
             this.setState({
               openWarning: true,
               warningLabel: 'BUMMER',
               warningTitle: 'WRONG PASSWORD',
-              warningMessage: 'Get out of here with those shenanigans!'
+              warningMessage: 'Get out of here with those shenanigans!',
+              singlemessage: localmessage
+            }, ()=>{
+              console.log('value of singlemessage: ', this.state.singlemessage);
             })
           }
           if(this.state.editreturn.data.status==='passwordsmatch'){
@@ -139,6 +145,19 @@ class Page2 extends Component {
               warningLabel: 'RIGHTEOUS',
               warningTitle: 'DATERBASE UPDATED',
               warningMessage: 'The database has been altered, pray I do not alter it further.'
+            })
+          }
+          if(this.state.editreturn.data.status==='messagedeleted'){
+            console.log(this.state.editreturn.data.remainingposts);
+            this.setState({
+              openWarning: true,
+              warningLabel: 'RIGHTEOUS',
+              warningTitle: 'DATERBASE UPDATED',
+              warningMessage: 'The database has been altered, pray I do not alter it further.',
+              showmessage: false,
+              messageList: this.state.editreturn.data.remainingposts
+            }, ()=>{
+              this.forceUpdate();
             })
           }
         }
@@ -162,38 +181,63 @@ class Page2 extends Component {
       editmessage: false,
       showeditbutton: true,
       showdeletebutton: true,
-      singlemessage: message
+      singlemessage: message,
+      savedmessagetitle: message.title,
+      savedmessagemessage: message.message
     })
   }
 
   editMessage(){
     console.log('value of this.state.singlemessage', this.state.singlemessage);
     if(this.state.secret.length === 0){
+      var localmessage = this.state.singlemessage
+      localmessage['title'] = this.state.savedmessagetitle;
+      localmessage['message'] = this.state.savedmessagemessage;
       this.setState({
         openWarning: true,
         warningLabel: 'BUMMER',
         warningTitle: 'NO U',
-        warningMessage: 'No blank passwords you jabroni!'
+        warningMessage: 'No blank passwords you jabroni!',
+        singlemessage: localmessage
       })
     }else{
       this.props.store.dispatch(messageUPDATE(this.state.singlemessage, this.state.secret))
     }
   }
 
+  deleteMessage(){
+    console.log('value of this.state.singlemessage', this.state.singlemessage);
+    if(this.state.secret.length === 0){
+      var localmessage = this.state.singlemessage
+      localmessage['title'] = this.state.savedmessagetitle;
+      localmessage['message'] = this.state.savedmessagemessage;
+      this.setState({
+        openWarning: true,
+        warningLabel: 'BUMMER',
+        warningTitle: 'NO U',
+        warningMessage: 'No blank passwords you jabroni!',
+        singlemessage: localmessage
+      })
+    }else{
+      console.log('in deleteMessage and value of this.state.secret is ', this.state.secret);
+      this.props.store.dispatch(messageDELETE(this.state.singlemessage, this.state.secret))
+    }
+  }
+
 
   editTitleHandler(value){
-    var localmessage = this.state.singlemessage
+    var localmessage = this.state.singlemessage;
     localmessage['title'] = value;
     this.setState({
-      singlemessage: localmessage
+      singlemessage: localmessage,
     })
   }
 
   editMessageHandler(value){
-    var localmessage = this.state.singlemessage
+    var localmessage = this.state.singlemessage;
     localmessage['message'] = value;
     this.setState({
-      singlemessage: localmessage
+      singlemessage: localmessage,
     })
   }
 
@@ -290,7 +334,7 @@ class Page2 extends Component {
                       </Flex1>
                       <Flex1/>
                       <Flex1>
-                        <RaisedButton label="DELETE" primary={true}   onClick={()=>this.retrieveMessagesfunction()}/>
+                        <RaisedButton label="DELETE" primary={true}   onClick={()=>this.deleteMessage()}/>
                       </Flex1>
                     </FlexRow>
                   </Flex1>
