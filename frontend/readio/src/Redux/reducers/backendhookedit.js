@@ -10,6 +10,8 @@ const backendhookedit = (state = [], action) => {
       return state = action.data;
     case 'ERROR':
       return state = [];
+    case 'RESET':
+      return state = [];
     default:
       console.log('inside default');
       return state;

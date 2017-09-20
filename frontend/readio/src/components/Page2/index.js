@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'react-redux'
-import { messageGET, messageUPDATE, messageDELETE } from '../../Redux/actions'
+import { messageGET, messageUPDATE, messageDELETE, resetSTATUS } from '../../Redux/actions'
 
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -110,58 +110,62 @@ class Page2 extends Component {
       savedmessagetitle: [],
       savedmessagemessage: [],
       editreturn: [],
+      expecting: ''
     };
 
    this.props.store.subscribe(() => {
-     if(this.props.store.getState().backendhook.length>0){
-       this.setState({
-         messageList: this.props.store.getState().backendhook
-       }, ()=>{
-         console.log('updated messageList: ', this.state.messageList);
-       })
+     if (this.state.expecting==='hook'){
+       if(this.props.store.getState().backendhook.length>0){
+         this.setState({
+           messageList: this.props.store.getState().backendhook
+         }, ()=>{
+           console.log('updated messageList: ', this.state.messageList);
+         })
+       }
      }
-     this.setState({
-       editreturn: this.props.store.getState().backendhookedit
-     }, ()=>{
-        console.log('updated editreturn: ', this.state.editreturn);
-        if(this.state.editreturn.data!=undefined){
-          if(this.state.editreturn.data.status==='passwordsdontmatch'){
-            var localmessage = this.state.singlemessage
-            localmessage['title'] = this.state.savedmessagetitle;
-            localmessage['message'] = this.state.savedmessagemessage;
-            this.setState({
-              openWarning: true,
-              warningLabel: 'BUMMER',
-              warningTitle: 'WRONG PASSWORD',
-              warningMessage: 'Get out of here with those shenanigans!',
-              singlemessage: localmessage
-            }, ()=>{
-              console.log('value of singlemessage: ', this.state.singlemessage);
-            })
+     if (this.state.expecting==='edit'){
+       this.setState({
+         editreturn: this.props.store.getState().backendhookedit
+       }, ()=>{
+          console.log('updated editreturn: ', this.state.editreturn);
+          if(this.state.editreturn.data!=undefined){
+            if(this.state.editreturn.data.status==='passwordsdontmatch'){
+              var localmessage = this.state.singlemessage
+              localmessage['title'] = this.state.savedmessagetitle;
+              localmessage['message'] = this.state.savedmessagemessage;
+              this.setState({
+                openWarning: true,
+                warningLabel: 'BUMMER',
+                warningTitle: 'WRONG PASSWORD',
+                warningMessage: 'Get out of here with those shenanigans!',
+                singlemessage: localmessage
+              }, ()=>{
+                console.log('value of singlemessage: ', this.state.singlemessage);
+              })
+            }
+            if(this.state.editreturn.data.status==='passwordsmatch'){
+              this.setState({
+                openWarning: true,
+                warningLabel: 'RIGHTEOUS',
+                warningTitle: 'DATERBASE UPDATED',
+                warningMessage: 'The database has been altered, pray I do not alter it further.'
+              })
+            }
+            if(this.state.editreturn.data.status==='messagedeleted'){
+              console.log(this.state.editreturn.data.remainingposts);
+              this.setState({
+                openWarning: true,
+                righteousbefore: true,
+                warningLabel: 'RIGHTEOUS',
+                warningTitle: 'DATERBASE UPDATED',
+                warningMessage: 'The database has been altered, pray I do not alter it further.',
+                showmessage: false,
+                messageList: this.state.editreturn.data.remainingposts
+              })
+            }
           }
-          if(this.state.editreturn.data.status==='passwordsmatch'){
-            this.setState({
-              openWarning: true,
-              warningLabel: 'RIGHTEOUS',
-              warningTitle: 'DATERBASE UPDATED',
-              warningMessage: 'The database has been altered, pray I do not alter it further.'
-            })
-          }
-          if(this.state.editreturn.data.status==='messagedeleted'){
-            console.log(this.state.editreturn.data.remainingposts);
-            this.setState({
-              openWarning: true,
-              warningLabel: 'RIGHTEOUS',
-              warningTitle: 'DATERBASE UPDATED',
-              warningMessage: 'The database has been altered, pray I do not alter it further.',
-              showmessage: false,
-              messageList: this.state.editreturn.data.remainingposts
-            }, ()=>{
-              this.forceUpdate();
-            })
-          }
-        }
-     });
+       });
+     }
    });
   }
 
@@ -171,6 +175,9 @@ class Page2 extends Component {
 
   handleClose = () => {
     this.setState({openWarning: false});
+    // setTimeout(()=>{
+    //   this.props.store.dispatch(resetSTATUS())
+    // }, 500)
   };
 
   openMessage(message){
@@ -201,7 +208,11 @@ class Page2 extends Component {
         singlemessage: localmessage
       })
     }else{
-      this.props.store.dispatch(messageUPDATE(this.state.singlemessage, this.state.secret))
+      this.setState({
+        expecting: 'edit'
+      }, ()=>{
+        this.props.store.dispatch(messageUPDATE(this.state.singlemessage, this.state.secret))
+      })
     }
   }
 
@@ -219,11 +230,13 @@ class Page2 extends Component {
         singlemessage: localmessage
       })
     }else{
-      console.log('in deleteMessage and value of this.state.secret is ', this.state.secret);
-      this.props.store.dispatch(messageDELETE(this.state.singlemessage, this.state.secret))
+      this.setState({
+        expecting: 'edit'
+      }, ()=>{
+        this.props.store.dispatch(messageDELETE(this.state.singlemessage, this.state.secret))
+      })
     }
   }
-
 
   editTitleHandler(value){
     var localmessage = this.state.singlemessage;
@@ -243,9 +256,11 @@ class Page2 extends Component {
 
   retrieveMessagesfunction(){
     console.log('inside retrieveMessagesfunction');
-    this.props.store.dispatch(messageGET())
     this.setState({
+      expecting: 'hook',
       messageBackground: 'rgb(49,51,72)'
+    }, ()=>{
+      this.props.store.dispatch(messageGET())
     })
   }
 

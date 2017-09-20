@@ -46,7 +46,7 @@ router.get('/allmessages', function(req,res,next){
       post.secret='redacted'
     })
     console.log('new value of posts', posts);
-    res.json(posts)
+    res.json({"posts": posts, "status":"retrievedallmessages"})
   })
 })
 

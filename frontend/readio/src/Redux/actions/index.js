@@ -57,7 +57,7 @@ export const messageGET = () => {
     axios.get('http://localhost:3000/allmessages')
     .then((response)=>{
       console.log('response is: ', response);
-      response.data.forEach(item=>{
+      response.data.posts.forEach(item=>{
         getarray.push(item)
       })
       console.log('value of temparray: ', getarray);
@@ -74,6 +74,13 @@ export const AXIOSSUCCESS = (array, whereto) => {
   return{
     type: whereto,
     data: array
+  }
+}
+
+export const resetSTATUS = () => {
+  console.log('inside resetSTATUS');
+  return{
+    type: 'RESET'
   }
 }
 

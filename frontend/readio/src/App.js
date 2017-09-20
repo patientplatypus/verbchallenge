@@ -15,7 +15,6 @@ import { css } from 'glamor';
 
 import Page1 from './components/Page1/index'
 import Page2 from './components/Page2/index'
-import Page3 from './components/Page3/index'
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';

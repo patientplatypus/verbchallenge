@@ -8,6 +8,7 @@ const backendhook = (state = [], action) => {
       return state = [];
     case 'GET':
       console.log('inside GET');
+      console.log('value of action.data', action.data);
       return state = action.data;
     case 'ERROR':
       return state = [];
