@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import { Route,  BrowserRouter as Router, Link } from 'react-router-dom'
 import { Redirect } from 'react-router'
 
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk';
 import { Provider } from 'react-redux'
 import reducersCombined from './Redux/reducers'
 
@@ -21,7 +22,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { colorLight, colorLightHighlight, colorMain, colorDarkHightLight, colorDark } from './colors';
 import './App.css';
 
-let store = createStore(reducersCombined)
+let store = createStore(reducersCombined, applyMiddleware(thunk))
 
 const main_theme = getMuiTheme({
   palette: {
@@ -31,7 +32,7 @@ const main_theme = getMuiTheme({
       accent2Color: colorDark,
       textColor: colorMain,
       alternateTextColor: colorLightHighlight,
-      canvasColor: colorDarkHightLight
+      canvasColor: colorDark
     }
 });
 

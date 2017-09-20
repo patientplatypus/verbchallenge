@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 
 //These actions are in here as dummies - I don't use them, but in many
 //assignments you will have previous hooks that are in the REDUX file
@@ -31,11 +33,19 @@ export const messageCREATE = ({title, message, secret}) => {
   console.log('secret: ', secret);
   console.log('message: ', message);
   console.log('title:', title);
-  return{
-    type: 'CREATE',
-    title: title,
-    message: message,
-    secret: secret
+  return(dispatch) => {
+    axios.post('http://localhost:3000/newmessage',{
+      message: message,
+      title: title,
+      secret: secret
+    })
+    .then((response)=>{
+      dispatch(AXIOSSUCCESS([], "CREATE"))
+    })
+    .catch((error)=>{
+      console.log('error is: ', error);
+      dispatch(AXIOSERROR())
+    })
   }
 }
 
@@ -46,18 +56,62 @@ export const messageDELETE = messageID => {
   }
 }
 
-export const messageGET = title => {
+export const messageGET = () => {
+  return (dispatch)=>{
+    console.log('inside GET');
+    var getarray = [];
+    axios.get('http://localhost:3000/allmessages')
+    .then((response)=>{
+      console.log('response is: ', response);
+      response.data.forEach(item=>{
+        getarray.push(item)
+      })
+      console.log('value of temparray: ', getarray);
+      dispatch(AXIOSSUCCESS(getarray, "GET"))
+    })
+    .catch((error)=>{
+      console.log('error is: ', error);
+      dispatch(AXIOSERROR())
+    })
+  }
+}
+
+export const AXIOSSUCCESS = (array, whereto) => {
   return{
-    type: 'GET',
+    type: whereto,
+    data: array
+  }
+}
+
+export const AXIOSERROR = () => {
+  return{
+    type: "ERROR"
+  }
+}
+
+export const messageSEARCH = title => {
+  return{
+    type: 'SEARCH',
     title: title
   }
 }
 
-export const messageUPDATE = ({title, message, secret}) => {
-  return{
-    type: 'UPDATE',
-    title: title,
-    message: message,
-    secret: secret
+export const messageUPDATE = (message, secret) => {
+  var url = 'http://localhost:3000/editpost/'+message._id
+  return (dispatch)=>{
+    console.log('inside UPDATE ACTION');
+    var getarray = [];
+    axios.patch(url, {
+      message: message,
+      secret: secret
+    })
+    .then((response)=>{
+      console.log('response is: ', response);
+      dispatch(AXIOSSUCCESS(response, "UPDATE"))
+    })
+    .catch((error)=>{
+      console.log('error is: ', error);
+      dispatch(AXIOSERROR())
+    })
   }
 }

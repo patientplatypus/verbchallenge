@@ -122,7 +122,7 @@ class Page1 extends Component {
             title={this.state.warningTitle}
             actions={actions}
             modal={true}
-            secondary={true}
+            primary={true}
             open={this.state.openWarning}
             onRequestClose={this.handleClose}
           >
