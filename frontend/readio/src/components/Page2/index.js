@@ -51,9 +51,9 @@ const Flex2 = styled.div`
 const MessageHolder = glamorous.div(
   {
     position: "absolute",
-    top: '70%',
+    top: '75%',
     width: '100%',
-    height: '30%',
+    height: '25%',
     left: '0%',
     textAlign: 'center',
     overflow: 'hidden',
